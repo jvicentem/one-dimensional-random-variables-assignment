@@ -6,7 +6,6 @@ output:
   html_document: 
   css: style.css
 theme: spacelab
-toc: yes
 ---
   
 ## Descuentos
@@ -15,13 +14,61 @@ Una empresa de servicios de Internet quiere hacer una campaña para aplicar entr
 descuento a sus clientes de forma aleatoria y lineal, y entonces la probabilidad de que un cliente reciba un
 determinado descuento se puede modelizar mediante la siguiente función de densidad:
 
-![](density-function.png)
+$$ \begin{cases}k(25 - x) & 5\leq x \leq25\\0 & resto\end{cases} $$
 
 Responde a las siguientes cuestiones:
-1. Calcula *k* para que *f(x)* sea realmente una funcion de densidad
-```{r, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 
+# Importamos bibliotecas
+library(Ryacas)
 ```
+
+1. Calcula *k* para que *f(x)* sea realmente una función de densidad.
+
+Para calcular el parámetro *k* he hecho uso de la librería Ryacas que permite utilizar la sintaxis YACAS para realizar cálculos matemáticos.
+
+Hemos tenido en cuenta que para que *f(x)* sea una función de densidad es necesario que se cumpla que $$ \int_{-\infty}^{\infty} f(x)dx = 1 $$, por lo tanto obtendremos *k* a partir de esa condición.
+
+Desarrollando:
+
+$$ \int_{-\infty}^{\infty} f(x)dx =  \int_{-\infty}^{5} f(x)dx + \int_{5}^{25} f(x)dx + \int_{25}^{\infty} f(x)dx $$
+
+Sustituyendo *f(x)* por el valor que le corresponde en función del intervalo:
+$$ \int_{-\infty}^{5} 0·dx + \int_{5}^{25} k(25 - x)·dx + \int_{25}^{\infty} 0·dx = 0 + \int_{5}^{25} k(25 - x)·dx + 0 = \int_{5}^{25} k(25 - x)·dx $$
+
+Igualamos a 1 para despejar *k* ya que es la condición necesaria para que *f(x)* sea una función de densidad:
+$$ \int_{5}^{25} k(25 - x)·dx = 1 $$
+
+Resolviendo la integral e igualando a 1:
+$$ \left [ -k·(\frac{x²}{2}-25x)  \right ]_5^{25}=1 $$
+```{r, warning=FALSE}
+yacas("Solve((Integrate(x, 5, 25) k*(25-x)) == 1, k)")
+```
+
+```{r, warning=FALSE}
+f <- function(x){ 
+  if (x >= 5 & x <= 25) {
+    return((1/200)*(25 - x))
+  }
+  else {
+    return(0)
+  }
+}
+```
+
+Obtenemos que $k = \frac{1}{200}$. Además, con ese valor de *k* también se cumple que $f(x) \gt 0$, condición también necesaria para que *f(x)* sea una función de densidad.
+
+Aprovechando que tenemos la función de densidad, podemos calcular la función de distribución, ya que $f(x) = F'(x)$.
+
+```{r, warning=FALSE}
+yacas("Integrate(x) (1/200)*(25-x)")
+```
+
+La función de distribución resulta:
+$$ \int_{}^{} \frac{1}{200}·(25 - x) dx = \frac{x}{8} - \frac{x²}{400}  $$ 
+
+$$ F(x) = \frac{x}{8} - \frac{x²}{400}  $$ 
+
 2. Calcula la probabilidad de que un cliente obtenga más de un 20% de descuento
 ```{r, warning=FALSE}
 
@@ -46,3 +93,7 @@ Responde a las siguientes cuestiones:
 ```{r, warning=FALSE}
 
 ```
+
+## Conclusiones
+http://www.di.fc.ul.pt/~jpn/r/symbolic/
+http://yacas.readthedocs.io/en/latest/index.html
