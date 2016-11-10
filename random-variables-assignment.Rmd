@@ -122,15 +122,15 @@ $$ \sigma ^{2} = V(x) = E[X^{2}] - [E(X)]^{2} = \int_{-\infty}^{\infty} x^2 f(x)
 
 Desarrollando lo anterior:
 
-$$ \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² = \int_{-\infty}^{\infty} x^2 f(x) dx- (\frac {35}{3})² = \int_{-\infty}^{5} x^2 0 dx- (\frac {35}{3})² + \int_{5}^{25} x^2 ·\frac{1}{200}·(25 - x)· dx- (\frac {35}{3})² + \int_{25}^{\infty} x^2 0 dx- (\frac {35}{3})² = \left [ \frac{x^{4}}{800} - \frac{x³}{24}  \right ]_{20}^{25} = \frac{475}{3} = 158.3333 $$
+$$ \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² = \int_{-\infty}^{\infty} x^2 f(x) dx- (\frac {35}{3})² = (\int_{-\infty}^{5} x^2 0 dx + \int_{5}^{25} x^2 ·\frac{1}{200}·(25 - x)· dx+ \int_{25}^{\infty} x^2 0 dx) - (\frac {35}{3})² = \left [ \frac{x^{4}}{800} - \frac{x³}{24}  \right ]_{5}^{25} - (\frac {35}{3})² = \frac{200}{9} = 22.2222 $$
 
 ```{r, warning=FALSE}
-yacas("Integrate(x, 5, 25) (x^2)*((1/200)*(25-x))")
+yacas("(Integrate(x, 5, 25) (x^2)*((1/200)*(25-x))) - (35/3)^2")
 ```
 
-La varianza es de 158.3333
+La varianza es de 22.2222
 
-Es decir $\sigma^2 = \frac{475}{3}$
+Es decir $\sigma^2 = \frac{200}{9}$
 
 
 5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
