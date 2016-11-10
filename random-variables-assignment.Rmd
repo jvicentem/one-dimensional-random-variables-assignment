@@ -20,6 +20,8 @@ Responde a las siguientes cuestiones:
 ```{r, message=FALSE, warning=FALSE}
 # Importamos bibliotecas
 
+install.packages("Ryacas")
+
 library(Ryacas)
 ```
 
