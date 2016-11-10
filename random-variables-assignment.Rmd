@@ -19,8 +19,7 @@ $$ \begin{cases}k(25 - x) & 5\leq x \leq25\\0 & resto\end{cases} $$
 Responde a las siguientes cuestiones:
 ```{r, message=FALSE, warning=FALSE}
 # Importamos bibliotecas
-
-install.packages("Ryacas")
+#install.packages("Ryacas")
 
 library(Ryacas)
 ```
@@ -114,11 +113,26 @@ yacas("Integrate(x, 5, 25) x*((1/200)*(25-x))")
 
 El descuento medio que se espera aplicar es de 11.66667%.
 
+Es decir $\mu = \frac{35}{3}$
+
 
 4. Calcula la varianza de la variable aleatoria
-```{r, warning=FALSE}
 
+$$ \sigma ^{2} = V(x) = E[X^{2}] - [E(X)]^{2} = \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² $$
+
+Desarrollando lo anterior:
+
+$$ \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² = \int_{-\infty}^{\infty} x^2 f(x) dx- (\frac {35}{3})² = \int_{-\infty}^{5} x^2 0 dx- (\frac {35}{3})² + \int_{5}^{25} x^2 ·\frac{1}{200}·(25 - x)· dx- (\frac {35}{3})² + \int_{25}^{\infty} x^2 0 dx- (\frac {35}{3})² = \left [ \frac{x^{4}}{800} - \frac{x³}{24}  \right ]_{20}^{25} = \frac{475}{3} = 158.3333 $$
+
+```{r, warning=FALSE}
+yacas("Integrate(x, 5, 25) (x^2)*((1/200)*(25-x))")
 ```
+
+La varianza es de 158.3333
+
+Es decir $\sigma^2 = \frac{475}{3}$
+
+
 5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
 ```{r, warning=FALSE}
 
