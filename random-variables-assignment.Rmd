@@ -152,13 +152,24 @@ yacas("D(x) ((1/200)*(25-x))")
 Esto quiere decir que la función es decreciente para el intervalo $5 \leq x \leq 25$ (para el resto de valores, la función de densidad siempre devuelve 0), por lo que el máximo valor se encuentra en el extremo inferior de este intervalo, por lo que la moda es x = 5.
 
 7. Calcula la mediana de la variable aleatoria
-```{r, warning=FALSE}
 
+F(Me) = 0.5
+
+$$ F(x) = \frac{x}{8} - \frac{x^2}{400} = 0.5 $$
+```{r, warning=FALSE}
+yacas("Solve((x/8)-(x^2/400) == 0.5, x)")
 ```
+
+$$ x_{1} = - (200 · (\sqrt{\frac{68}{6400}} - \frac{1}{8}) = 4.384472$$
+$$ x_{2} = - (-200 · (\sqrt{\frac{68}{6400}} + \frac{1}{8}) = 45.61553$$
+
 
 ## Conclusiones
 http://www.di.fc.ul.pt/~jpn/r/symbolic/
 http://yacas.readthedocs.io/en/latest/index.html
+https://cran.r-project.org/web/packages/Ryacas/vignettes/Ryacas.pdf
 
 https://www.codecogs.com/latex/eqneditor.php
 http://www.hostmath.com/
+
+http://halweb.uc3m.es/esp/Personal/personas/mwiper/docencia/Spanish/Introduction_to_Statistics/intro_variables2.pdf <- mediana
