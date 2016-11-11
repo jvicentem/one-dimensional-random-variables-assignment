@@ -134,13 +134,23 @@ Es decir $\sigma^2 = \frac{200}{9}$
 
 
 5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
+
 ```{r, warning=FALSE}
 
 ```
+
 6. ¿Cuál es la moda de la variable aleatoria?
-```{r, warning=FALSE}
 
+Calculo el valor máximo de la función de densidad para hallar la moda:
+
+$$ f'(x) = \frac{-1}{200}  $$ 
+
+```{r, warning=FALSE}
+yacas("D(x) ((1/200)*(25-x))")
 ```
+
+Esto quiere decir que la función es decreciente para el intervalo $5 \leq x \leq 25$ (para el resto de valores, la función de densidad siempre devuelve 0), por lo que el máximo valor se encuentra en el extremo inferior de este intervalo, por lo que la moda es x = 5.
+
 7. Calcula la mediana de la variable aleatoria
 ```{r, warning=FALSE}
 
