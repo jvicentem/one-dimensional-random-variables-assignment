@@ -141,7 +141,7 @@ Es decir $\sigma^2 = \frac{200}{9}$
 
 Para calcular este apartado, vamos a utilizar el teorema de la desigualdad de Tchebychev.
 
-Dicho teorema dice que para cualquier población con media $\mu$, desviación estándar $\sigma$, y *k* > 1, el porcentaje de observaciones dentro del intervalo $\left [ \mu \pm k\sigma  \right ]$ es al menos igual $1 - \frac{1}{k^2}$ donde k es el número de desviaciones estándar.
+Dicho teorema dice que para cualquier población con media $\mu$, desviación estándar $\sigma$, y *k* > 1, la probabilidad de que las observaciones estén dentro del intervalo $\left [ \mu \pm k\sigma  \right ]$ es de al menos $1 - \frac{1}{k^2}$, donde k es el número de desviaciones estándar.
 
 Por ello, vamos a calcular el valor de *k* cuando $1 - \frac{1}{k^2}$ es igual a 0.5
  
@@ -149,20 +149,36 @@ Por ello, vamos a calcular el valor de *k* cuando $1 - \frac{1}{k^2}$ es igual a
 yacas("Solve((1 - (1/k^2)) == 0.5, k)")
 ```
 
-Descartamos el valor negativo ya que *k* debe ser mayor que 1, por lo que $k = \sqrt{\frac{1}{0.5}}$.
+Descartamos el valor negativo ya que *k* debe ser mayor que 1, por lo que $k = \sqrt{\frac{1}{0.5}} = \sqrt{2}$.
 
 Calculamos $\left [ \mu \pm k\sigma  \right ]$ ahora que sabemos el valor de *k*:
 
-$$ \left [ \frac{35}{3} \pm \sqrt{\frac{1}{0.5}}\sqrt{\frac{200}{9}}  \right ] $$
+$$ \left [ \frac{35}{3} \pm \sqrt{2}\sqrt{\frac{200}{9}}  \right ] $$
 
 ```{r, warning=FALSE}
-(35/3)-(sqrt(1/0.5)*sqrt(200/9))
-(35/3)+(sqrt(1/0.5)*sqrt(200/9))
+(35/3)-(sqrt(2)*sqrt(200/9))
+(35/3)+(sqrt(2)*sqrt(200/9))
 ```
 
 Los valores entre los que probablemente estarán la mitad de los descuentos realizados son los comprendidos en este intervalo:
 
 $$ \left [ 5, 18.33333  \right ] $$
+
+#NOTA: 
+
+Lo anterior está mal seguramente. Apoyándonos con el ejercicio 7 en el que se calcula la mediana, la mitad de los descuentos realizados estarán en el intervalo 
+
+$$ \left [ 5, 10.85786  \right ] $$
+
+#NOTA2: 
+
+Otra posibilidad es que la mitad de los descuentos realizados estén en el intervalo 
+
+$$ \left [ \mu \pm \sigma \right ] $$
+
+$$ \left [ \frac{35}{3} \pm \sqrt{\frac{200}{9}} \right ] = $$
+
+$$ \left [ 6.952621, 16.38071 \right ] $$
 
 
 6. ¿Cuál es la moda de la variable aleatoria?
