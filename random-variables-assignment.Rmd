@@ -22,6 +22,7 @@ Responde a las siguientes cuestiones:
 #install.packages("Ryacas")
 
 library(Ryacas)
+library(ggplot2)
 ```
 
 ### 1. Calcula *k* para que *f(x)* sea realmente una función de densidad.
@@ -83,9 +84,19 @@ F <- function(x){
 ```
 
 ```{r, warning=FALSE}
-h <- Vectorize(f); curve(h, from=3, to=28)
 
-g <- Vectorize(F); curve(g, from=3, to=28)
+f_plot <- ggplot(data.frame(x=c(5, 25)), aes(x)) + 
+            stat_function(fun=f, geom="line") + 
+            ylim(0, 0.15) + 
+            labs(x="Descuento (%)", y="f(x)") 
+
+F_plot <- ggplot(data.frame(x=c(5, 25)), aes(x)) + 
+            stat_function(fun=F, geom="line") + 
+            ylim(0, 1.6) + 
+            labs(x="Descuento (%)", y="F(x)") 
+
+f_plot
+F_plot
 ```
 
 ### 2. Calcula la probabilidad de que un cliente obtenga más de un 20% de descuento
@@ -161,7 +172,7 @@ $$ \int_{-\infty}^{q_{3}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{q_{3}} 
 $$ \left [ \frac{x}{8} - \frac{x²}{400} \right ]_{5}^{q_{3}} = 0.75 $$
 
 ```{r, warning=FALSE}
-yacas("Solve((Integrate(x, 5, q2) ((1/200)*(25-x))) == 0.75, q2)")
+yacas("Solve((Integrate(x, 5, q3) ((1/200)*(25-x))) == 0.75, q3)")
 ```
 
 $$ q_{3a} = - (200 · (\sqrt{\frac{256}{102400}} - \frac{1}{8}) = 15$$
@@ -171,6 +182,15 @@ Tanto para $q_{1}$ y $q_{3}$ nos quedamos con el primer valor obtenido porque lo
 
 La mitad de los descuentos realizados estarán en el intervalo $\left [7.679492, 15 \right ]$
 
+```{r, warning=FALSE}
+quartiles_plot <- f_plot + 
+                    geom_vline(xintercept = 7.679492, colour="red") + 
+                    geom_vline(xintercept = 15, colour="blue") +
+                    geom_text(aes(x=15, label="\nq3", y=0.10), colour="blue", angle=90) +
+                    geom_text(aes(x=7.679492, label="\nq1", y=0.10), colour="red", angle=90)
+
+quartiles_plot
+```
 
 ### 6. ¿Cuál es la moda de la variable aleatoria?
 
@@ -183,6 +203,13 @@ yacas("D(x) ((1/200)*(25-x))")
 $$ f'(x) = \frac{-1}{200}  $$ 
 
 Esto quiere decir que la función es decreciente para el intervalo $5 \leq x \leq 25$ (para el resto de valores, la función de densidad siempre devuelve 0), por lo que el máximo valor se encuentra en el extremo inferior de este intervalo, por lo que la moda es $M_{o} = 5$.
+
+```{r}
+mode_plot <- quartiles_plot +
+              geom_text(aes(label='Mo'), x=5, y=0, colour="green4")
+
+mode_plot
+```
 
 ### 7. Calcula la mediana de la variable aleatoria
 
@@ -202,3 +229,8 @@ $$ M_{e2} = - (-200 · (\sqrt{\frac{512}{102400}} + \frac{1}{8}) = 39.14214$$
 Descartamos $M_{e2}$ por ser un valor que no está contenido en el intervalo, por lo que nos quedamos con el valor $M_{e1}$.
 
 Por lo tanto, la mediana es $M_{e} = 10.85786$
+
+```{r, warning=FALSE}
+mode_plot + geom_vline(xintercept = 10.85786, colour="orange") + 
+                    geom_text(aes(x=10.85786, label="\nq2|Me", y=0.10), colour="orange", angle=90)
+```
