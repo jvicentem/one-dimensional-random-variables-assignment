@@ -24,7 +24,7 @@ Responde a las siguientes cuestiones:
 library(Ryacas)
 ```
 
-1. Calcula *k* para que *f(x)* sea realmente una función de densidad.
+### 1. Calcula *k* para que *f(x)* sea realmente una función de densidad.
 
 Primero, vamos a definir la variable aleatoria *X* como *X: Porcentaje de descuento que puede obtener un cliente (en tantos por ciento)*. *X* es una variable aleatoria continua cuyos valores están comprendidos en el intervalo [5, 25].
 
@@ -88,7 +88,7 @@ h <- Vectorize(f); curve(h, from=3, to=28)
 g <- Vectorize(F); curve(g, from=3, to=28)
 ```
 
-2. Calcula la probabilidad de que un cliente obtenga más de un 20% de descuento
+### 2. Calcula la probabilidad de que un cliente obtenga más de un 20% de descuento
 
 $$P(X \geq 20) = \int_{20}^{\infty} \frac{1}{200}·(25 - x) dx = \int_{20}^{25} \frac{1}{200}·(25 - x) dx  + \int_{25}^{\infty} 0 dx=  \left [ \frac{x}{8} - \frac{x²}{400}  \right ]_{20}^{25} = \frac{1}{16} = 0.0625$$
 
@@ -99,7 +99,7 @@ yacas("Integrate(x, 20, 25) (1/200)*(25-x)")
 La probabilidad de un cliente obtenga más de un 20% de descuento es 0.0625 (6.25%)
 
 
-3. ¿Cuál es el descuento medio que se espera aplicar?
+### 3. ¿Cuál es el descuento medio que se espera aplicar?
 
 En las variables aleatorias continuas la esperanza matemática se define de la siguiente manera: 
 
@@ -118,7 +118,7 @@ El descuento medio que se espera aplicar es de 11.66667%.
 Es decir $\mu = \frac{35}{3}$
 
 
-4. Calcula la varianza de la variable aleatoria
+### 4. Calcula la varianza de la variable aleatoria
 
 $$ \sigma ^{2} = V(x) = E[X^{2}] - [E(X)]^{2} = \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² $$
 
@@ -137,35 +137,42 @@ La varianza es de 22.2222
 Es decir $\sigma^2 = \frac{200}{9}$
 
 
-5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
+### 5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
 
-Para calcular este apartado, vamos a utilizar el teorema de la desigualdad de Tchebychev.
+Para calcular los valores entre los que es posible que se encuentre la mitad de los descuentos realizados vamos a calcular el primer y el tercer cuartil.
 
-Dicho teorema dice que para cualquier población con media $\mu$, desviación estándar $\sigma$, y *k* > 1, el porcentaje de observaciones dentro del intervalo $\left [ \mu \pm k\sigma  \right ]$ es al menos igual $1 - \frac{1}{k^2}$ donde k es el número de desviaciones estándar.
+$$ P(X \leq q_{1}) = 0.25$$
 
-Por ello, vamos a calcular el valor de *k* cuando $1 - \frac{1}{k^2}$ es igual a 0.5
- 
-```{r, warning=FALSE}
-yacas("Solve((1 - (1/k^2)) == 0.5, k)")
-```
+$$ \int_{-\infty}^{q_{1}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{q_{1}} f(x)dx =  \int_{-\infty}^{5} 0dx + \int_{5}^{q_{1}} \frac{1}{200}·(25 - x)dx = \left [ \frac{x}{8} - \frac{x²}{400} \right ]_{5}^{q_{1}}  $$
 
-Descartamos el valor negativo ya que *k* debe ser mayor que 1, por lo que $k = \sqrt{\frac{1}{0.5}}$.
-
-Calculamos $\left [ \mu \pm k\sigma  \right ]$ ahora que sabemos el valor de *k*:
-
-$$ \left [ \frac{35}{3} \pm \sqrt{\frac{1}{0.5}}\sqrt{\frac{200}{9}}  \right ] $$
+$$ \left [ \frac{x}{8} - \frac{x²}{400} \right ]_{5}^{q_{1}} = 0.25 $$
 
 ```{r, warning=FALSE}
-(35/3)-(sqrt(1/0.5)*sqrt(200/9))
-(35/3)+(sqrt(1/0.5)*sqrt(200/9))
+yacas("Solve((Integrate(x, 5, q1) ((1/200)*(25-x))) == 0.25, q1)")
 ```
 
-Los valores entre los que probablemente estarán la mitad de los descuentos realizados son los comprendidos en este intervalo:
+$$ q_{1a} = - (200 · (\sqrt{\frac{768}{102400}} - \frac{1}{8}) = 7.679492$$
+$$ q_{1b} = - (-200 · (\sqrt{\frac{768}{102400}} + \frac{1}{8}) = 42.32051$$
 
-$$ \left [ 5, 18.33333  \right ] $$
+$$ P(X \leq q_{3}) = 0.75$$
+
+$$ \int_{-\infty}^{q_{3}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{q_{3}} f(x)dx =  \int_{-\infty}^{5} 0dx + \int_{5}^{q_{3}} \frac{1}{200}·(25 - x)dx = \left [ \frac{x}{8} - \frac{x²}{400} \right ]_{5}^{q_{3}}  $$
+
+$$ \left [ \frac{x}{8} - \frac{x²}{400} \right ]_{5}^{q_{3}} = 0.75 $$
+
+```{r, warning=FALSE}
+yacas("Solve((Integrate(x, 5, q2) ((1/200)*(25-x))) == 0.75, q2)")
+```
+
+$$ q_{3a} = - (200 · (\sqrt{\frac{256}{102400}} - \frac{1}{8}) = 15$$
+$$ q_{3b} = - (-200 · (\sqrt{\frac{256}{102400}} + \frac{1}{8}) = 35$$
+
+Tanto para $q_{1}$ y $q_{3}$ nos quedamos con el primer valor obtenido porque los segundos valores no entran dentro del intervalo que estamos estudiando.
+
+La mitad de los descuentos realizados estarán en el intervalo $\left [7.679492, 15 \right ]$
 
 
-6. ¿Cuál es la moda de la variable aleatoria?
+### 6. ¿Cuál es la moda de la variable aleatoria?
 
 Calculo el valor máximo de la función de densidad para hallar la moda derivando la función de densidad respecto a *x*:
 
@@ -177,7 +184,7 @@ $$ f'(x) = \frac{-1}{200}  $$
 
 Esto quiere decir que la función es decreciente para el intervalo $5 \leq x \leq 25$ (para el resto de valores, la función de densidad siempre devuelve 0), por lo que el máximo valor se encuentra en el extremo inferior de este intervalo, por lo que la moda es $M_{o} = 5$.
 
-7. Calcula la mediana de la variable aleatoria
+### 7. Calcula la mediana de la variable aleatoria
 
 $$ P(X \leq M_{e}) = \frac{1}{2}$$
 
@@ -195,11 +202,3 @@ $$ M_{e2} = - (-200 · (\sqrt{\frac{512}{102400}} + \frac{1}{8}) = 39.14214$$
 Descartamos $M_{e2}$ por ser un valor que no está contenido en el intervalo, por lo que nos quedamos con el valor $M_{e1}$.
 
 Por lo tanto, la mediana es $M_{e} = 10.85786$
-
-## Conclusiones
-http://www.di.fc.ul.pt/~jpn/r/symbolic/
-http://yacas.readthedocs.io/en/latest/index.html
-https://cran.r-project.org/web/packages/Ryacas/vignettes/Ryacas.pdf
-
-https://www.codecogs.com/latex/eqneditor.php
-http://www.hostmath.com/
