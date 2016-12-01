@@ -1,0 +1,258 @@
+---
+title: "Práctica Variable Aleatoria unidimensional"
+author: "Emilio López Cano"
+date: "21 de octubre de 2016"
+output: 
+  html_document: 
+  css: style.css
+theme: spacelab
+---
+  
+## Descuentos
+  
+Una empresa de servicios de Internet quiere hacer una campaña para aplicar entre un 5% y un 25% de
+descuento a sus clientes de forma aleatoria y lineal, y entonces la probabilidad de que un cliente reciba un
+determinado descuento se puede modelizar mediante la siguiente función de densidad:
+
+$$ \begin{cases}k(25 - x) & 5\leq x \leq25\\0 & resto\end{cases} $$
+
+Responde a las siguientes cuestiones:
+```{r, message=FALSE, warning=FALSE}
+# Importación de bibliotecas y creación de funciones para cálculos con Máxima
+library(ggplot2)
+
+maxima <- function(maxima_expression){
+            callmaxima <- paste("maxima","--very-quiet","--batch-string","'tex(",maxima_expression,")$","sprint(",maxima_expression,")$'")
+            return(system(callmaxima, intern = TRUE))
+}
+
+print_maxima_result <- function(result_variable){
+                        cat(result_variable[length(result_variable)])
+}
+```
+
+### 1. Calcula *k* para que *f(x)* sea realmente una función de densidad.
+
+Primero, vamos a definir la variable aleatoria *X* como *X: Porcentaje de descuento que puede obtener un cliente (en tantos por ciento)*. *X* es una variable aleatoria continua cuyos valores están comprendidos en el intervalo [5, 25].
+
+
+Para calcular el parámetro *k* he hecho uso de la librería Ryacas que permite utilizar la sintaxis YACAS para realizar cálculos matemáticos.
+
+Hemos tenido en cuenta que para que *f(x)* sea una función de densidad es necesario que se cumpla que $$ \int_{-\infty}^{\infty} f(x)dx = 1 $$, por lo tanto obtendremos *k* a partir de esa condición.
+
+Desarrollando:
+
+$$ \int_{-\infty}^{\infty} f(x)dx =  \int_{-\infty}^{5} f(x)dx + \int_{5}^{25} f(x)dx + \int_{25}^{\infty} f(x)dx $$
+
+Sustituyendo *f(x)* por el valor que le corresponde en función del intervalo:
+$$ \int_{-\infty}^{5} 0·dx + \int_{5}^{25} k(25 - x)·dx + \int_{25}^{\infty} 0·dx = 0 + \int_{5}^{25} k(25 - x)·dx + 0 = \int_{5}^{25} k(25 - x)·dx $$
+
+Igualamos a 1 para despejar *k* ya que es la condición necesaria para que *f(x)* sea una función de densidad:
+$$ \int_{5}^{25} k(25 - x)·dx = 1 $$
+
+Resolviendo la integral e igualando a 1:
+$$ \left [ -k·(\frac{x²}{2}-25x)  \right ]_5^{25}=1 $$
+```{r, warning=FALSE}
+maxima_expr <- "integrate(k*(25-x), x, 5, 25)"
+solvestr <- paste("solve ([", maxima_expr, "= 1], [k])")
+k <- maxima(solvestr)
+
+print_maxima_result(k)
+```
+
+```{r, warning=FALSE}
+f <- function(x){ 
+  if (x >= 5 & x <= 25) {
+    return((1/200)*(25 - x))
+  }
+  else {
+    return(0)
+  }
+}
+```
+
+Obtenemos que $k = \frac{1}{200}$. Además, con ese valor de *k* también se cumple que $f(x) \gt 0$, condición también necesaria para que *f(x)* sea una función de densidad.
+
+Aprovechando que tenemos la función de densidad, podemos calcular la función de distribución, ya que $f(x) = F'(x)$.
+
+```{r, warning=FALSE}
+print_maxima_result(maxima("integrate((1/200)*(25-x), x)"))
+```
+
+La función de distribución resulta:
+$$ F(x) = \int_{}^{} \frac{1}{200}·(25 - x) dx = \frac{25·x - \frac{x^2}{2}}{200} $$ 
+
+```{r, warning=FALSE}
+F <- function(x){ 
+  if (x >= 5 & x <= 25) {
+    return((25*x-x^2/2)/200)
+  }
+  else {
+    return(0)
+  }
+}
+```
+
+```{r, warning=FALSE}
+
+f_plot <- ggplot(data.frame(x=c(5, 25)), aes(x)) + 
+            stat_function(fun=f, geom="line") + 
+            ylim(0, 0.15) + 
+            labs(x="Descuento (%)", y="f(x)") 
+
+F_plot <- ggplot(data.frame(x=c(5, 25)), aes(x)) + 
+            stat_function(fun=F, geom="line") + 
+            ylim(0, 1.6) + 
+            labs(x="Descuento (%)", y="F(x)") 
+
+f_plot
+F_plot
+```
+
+### 2. Calcula la probabilidad de que un cliente obtenga más de un 20% de descuento
+
+$$P(X \geq 20) = \int_{20}^{\infty} \frac{1}{200}·(25 - x) dx = \int_{20}^{25} \frac{1}{200}·(25 - x) dx  + \int_{25}^{\infty} 0 dx=  \left [ \frac{25·x - \frac{x^2}{2}}{200}  \right ]_{20}^{25} = \frac{1}{16} = 0.0625$$
+
+```{r, warning=FALSE}
+print_maxima_result(maxima("integrate((1/200)*(25-x), x, 20, 25)"))
+```
+
+La probabilidad de un cliente obtenga más de un 20% de descuento es 0.0625 (6.25%)
+
+
+### 3. ¿Cuál es el descuento medio que se espera aplicar?
+
+En las variables aleatorias continuas la esperanza matemática se define de la siguiente manera: 
+
+$$ \mu = E(X) = \int_{-\infty}^{\infty} x·f(x)dx $$
+
+Desarrollando lo anterior: $$ \mu = \int_{-\infty}^{\infty} x·f(x)dx =$$
+$$\int_{-\infty}^{5} x·0dx + \int_{5}^{25} x·\frac{1}{200}·(25 - x)dx + \int_{25}^{\infty} x·0dx =$$
+$$\left [ \frac{x²}{16} - \frac{x³}{600}  \right ]_{20}^{25} = \frac{35}{3} =0.0625  $$
+  
+```{r, warning=FALSE}
+print_maxima_result(maxima("integrate(x*((1/200)*(25-x)), x, 5, 25)"))
+```
+
+El descuento medio que se espera aplicar es de 11.66667%.
+
+Es decir $\mu = \frac{35}{3}$
+
+
+### 4. Calcula la varianza de la variable aleatoria
+
+$$ \sigma ^{2} = V(x) = E[X^{2}] - [E(X)]^{2} = \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² $$
+
+Desarrollando lo anterior:
+
+$$ \int_{-\infty}^{\infty} x^2 f(x) dx- \mu² = \int_{-\infty}^{\infty} x^2 f(x) dx- (\frac {35}{3})² =$$
+$$(\int_{-\infty}^{5} x^2 0 dx + \int_{5}^{25} x^2 ·\frac{1}{200}·(25 - x)· dx+ \int_{25}^{\infty} x^2 0 dx) - (\frac {35}{3})² =$$
+$$\left [ \frac{x^{4}}{800} - \frac{x³}{24}  \right ]_{5}^{25} - (\frac {35}{3})² = \frac{200}{9} = 22.2222 $$
+
+```{r, warning=FALSE}
+print_maxima_result(maxima("integrate((x^2)*((1/200)*(25-x)), x, 5, 25) - (35/3)^2"))
+```
+
+La varianza es de 22.2222
+
+Es decir $\sigma^2 = \frac{200}{9}$
+
+
+### 5. ¿Entre qué valores estarán probablemente la mitad de los descuentos realizados?
+
+Para calcular los valores entre los que es posible que se encuentre la mitad de los descuentos realizados vamos a calcular el primer y el tercer cuartil.
+
+$$ P(X \leq q_{1}) = 0.25$$
+
+$$ \int_{-\infty}^{q_{1}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{q_{1}} f(x)dx =  \int_{-\infty}^{5} 0dx + \int_{5}^{q_{1}} \frac{1}{200}·(25 - x)dx = \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{q_{1}}  $$
+
+$$ \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{q_{1}} = 0.25 $$
+
+```{r, warning=FALSE}
+int_q1 <- "integrate(((1/200)*(25-x)), x, 5, q1)"
+solve_q1 <- paste("solve ([", int_q1, "= 0.25], [q1])")
+q1 <- maxima(solve_q1)
+
+print_maxima_result(q1)
+```
+
+$$ q_{1a} = 25-10·\sqrt{3} = 7.679492$$
+$$ q_{1b} = 25+10·\sqrt{3} = 42.32051$$
+
+$$ P(X \leq q_{3}) = 0.75$$
+
+$$ \int_{-\infty}^{q_{3}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{q_{3}} f(x)dx =  \int_{-\infty}^{5} 0dx + \int_{5}^{q_{3}} \frac{1}{200}·(25 - x)dx = \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{q_{3}}  $$
+
+$$ \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{q_{3}} = 0.75 $$
+
+```{r, warning=FALSE}
+int_q3 <- "integrate(((1/200)*(25-x)), x, 5, q3)"
+solve_q3 <- paste("solve ([", int_q3, "= 0.75], [q3])")
+q3 <- maxima(solve_q3)
+
+print_maxima_result(q3)
+```
+
+$$ q_{3a} = - (200 · (\sqrt{\frac{256}{102400}} - \frac{1}{8}) = 15$$
+$$ q_{3b} = - (-200 · (\sqrt{\frac{256}{102400}} + \frac{1}{8}) = 35$$
+
+Tanto para $q_{1}$ y $q_{3}$ nos quedamos con el primer valor obtenido porque los segundos valores no entran dentro del intervalo que estamos estudiando.
+
+La mitad de los descuentos realizados estarán en el intervalo $\left [7.679492, 15 \right ]$
+
+```{r, warning=FALSE}
+quartiles_plot <- f_plot + 
+                    geom_vline(xintercept = 7.679492, colour="red") + 
+                    geom_vline(xintercept = 15, colour="blue") +
+                    geom_text(aes(x=15, label="\nq3", y=0.10), colour="blue", angle=90) +
+                    geom_text(aes(x=7.679492, label="\nq1", y=0.10), colour="red", angle=90)
+
+quartiles_plot
+```
+
+### 6. ¿Cuál es la moda de la variable aleatoria?
+
+Calculo el valor máximo de la función de densidad para hallar la moda derivando la función de densidad respecto a *x*:
+
+```{r, warning=FALSE}
+print_maxima_result(maxima("diff(((1/200)*(25-x)), x)"))
+```
+
+$$ f'(x) = \frac{-1}{200}  $$ 
+
+Esto quiere decir que la función es decreciente para el intervalo $5 \leq x \leq 25$ (para el resto de valores, la función de densidad siempre devuelve 0), por lo que el máximo valor se encuentra en el extremo inferior de este intervalo, por lo que la moda es $M_{o} = 5$.
+
+```{r}
+mode_plot <- quartiles_plot +
+              geom_text(aes(label='Mo'), x=5, y=0, colour="green4")
+
+mode_plot
+```
+
+### 7. Calcula la mediana de la variable aleatoria
+
+$$ P(X \leq M_{e}) = \frac{1}{2}$$
+
+$$ \int_{-\infty}^{M_{e}} f(x)dx = \int_{-\infty}^{5} f(x)dx + \int_{5}^{M_{e}} f(x)dx =  \int_{-\infty}^{5} 0dx + \int_{5}^{M_{e}} \frac{1}{200}·(25 - x)dx = \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{M_{e}}  $$
+
+$$ \left [ \frac{25·x - \frac{x^2}{2}}{200} \right ]_{5}^{M_{e}} = \frac{1}{2} $$
+
+```{r, warning=FALSE}
+int_me <- "integrate(((1/200)*(25-x)), x, 5, Me)"
+solve_me <- paste("solve ([", int_me, "=0.50], [Me])")
+me <- maxima(solve_me)
+
+print_maxima_result(me)
+```
+
+$$ M_{e1} = 25-5·2^{\frac{3}{2}} = 10.85786$$
+$$ M_{e2} = 25+5·2^{\frac{3}{2}} = 39.14214$$
+
+Descartamos $M_{e2}$ por ser un valor que no está contenido en el intervalo, por lo que nos quedamos con el valor $M_{e1}$.
+
+Por lo tanto, la mediana es $M_{e} = 10.85786$
+
+```{r, warning=FALSE}
+mode_plot + geom_vline(xintercept = 10.85786, colour="orange") + 
+                    geom_text(aes(x=10.85786, label="\nq2|Me", y=0.10), colour="orange", angle=90)
+```
