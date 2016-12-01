@@ -256,3 +256,8 @@ Por lo tanto, la mediana es $M_{e} = 10.85786$
 mode_plot + geom_vline(xintercept = 10.85786, colour="orange") + 
                     geom_text(aes(x=10.85786, label="\nq2|Me", y=0.10), colour="orange", angle=90)
 ```
+
+## Conclusiones y comentarios
+Para la realización de esta práctica se ha usado R Studio y el paquete de representación gráfica ggplot, además de usarse el programa Maxima para realizar cálculos. He usado una herramienta de control de versiones, Git, y este proyecto se puede encontrar en [https://github.com/jvicentem/one-dimensional-random-variables-assignment](https://github.com/jvicentem/one-dimensional-random-variables-assignment). 
+
+Gracias a esta práctica he podido repasar y afianzar aquellos conceptos sobre variables aleatorias que hemos visto en clase. 
